@@ -116,6 +116,18 @@ man_MANS += $(rst_man_pages)
 CLEANFILES += $(rst_man_pages)
 endif
 
+if CONFIG_SWND
+bin_PROGRAMS += swnd
+swnd_SOURCES = swnd.c
+swnd_CFLAGS = @LIBNL3_CFLAGS@ @LIBNL_GENL3_CFLAGS@ @LIBTALLOC_CFLAGS@ \
+	      @LIBTEVENT_CFLAGS@ @LIBSAMBA_HOSTCONFIG_CFLAGS@ \
+	      @LIBSAMBA_CREDENTIALS_CFLAGS@ @LIBSWNCLIENT_CFLAGS@
+swnd_LDADD = @LIBNL3_LIBS@ @LIBNL_GENL3_LIBS@ @LIBTALLOC_LIBS@ \
+	     @LIBTEVENT_LIBS@ @LIBSAMBA_HOSTCONFIG_LIBS@ @LIBSAMBA_CREDENTIALS_LIBS@ \
+	     @LIBSWNCLIENT_LIBS@ -lsystemd -lndr-krb5pac
+rst_man_pages += swnd.1
+endif
+
 SUBDIRS = contrib
 
 install-exec-hook:

@@ -65,6 +65,11 @@ AC_ARG_ENABLE(man,
 	enable_man=$enableval,
 	enable_man="maybe")
 
+AC_ARG_ENABLE(swnd,
+        [AS_HELP_STRING([--enable-swnd],[Create swnd binary @<:@default=yes@:>@])],
+        enable_swnd=$enableval,
+        enable_swnd="maybe")
+
 # "with" options
 AC_ARG_WITH(idmap-plugin,
 	[AS_HELP_STRING([--with-idmap-plugin=/path/to/plugin],[Define the path to the plugin that the idmapping infrastructure should use @<:@default=/etc/cifs-utils/idmap-plugin@:>@])],
@@ -241,6 +246,14 @@ if test $enable_pam != "no"; then
 			])
 fi
 
+PKG_CHECK_MODULES(LIBNL3, libnl-3.0 >= 3.1)
+PKG_CHECK_MODULES(LIBNL_GENL3, libnl-genl-3.0 >= 3.1)
+PKG_CHECK_MODULES(LIBTALLOC, talloc >= 2.3)
+PKG_CHECK_MODULES(LIBTEVENT, tevent >= 0.10)
+PKG_CHECK_MODULES(LIBSAMBA_HOSTCONFIG, samba-hostconfig >= 0.0.1)
+PKG_CHECK_MODULES(LIBSAMBA_CREDENTIALS, samba-credentials >= 1.0.0)
+PKG_CHECK_MODULES(LIBSWNCLIENT, swnclient >= 0.1.0)
+
 # ugly, but I'm not sure how to check for functions in a library that's not in $LIBS
 cu_saved_libs=$LIBS
 LIBS="$LIBS $KRB5_LDADD"
@@ -289,6 +302,7 @@ AM_CONDITIONAL(CONFIG_SMBINFO, [test "$enable_smbinfo" != "no"])
 AM_CONDITIONAL(CONFIG_PYTHON_TOOLS, [test "$enable_pythontools" != "no"])
 AM_CONDITIONAL(CONFIG_PAM, [test "$enable_pam" != "no"])
 AM_CONDITIONAL(CONFIG_PLUGIN, [test "$enable_cifsidmap" != "no" -o "$enable_cifsacl" != "no"])
+AM_CONDITIONAL(CONFIG_SWND, [test "$enable_swnd" != "no"])
 
 LIBCAP_NG_PATH
 
