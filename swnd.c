@@ -3,6 +3,7 @@
 #include <stdbool.h>
 #include <signal.h>
 #include <errno.h>
+#include <getopt.h>
 
 #include <talloc.h>
 
@@ -959,11 +960,29 @@ void samba_debug_cb(void *private_data, int level, const char *msg)
 	sd_journal_print(sd_lvl, msg);
 }
 
+static const struct option long_options[] = {
+	{"debuglevel", 1, NULL, 'd'},
+	{NULL, 0, NULL, 0}
+};
+
 int main(int argc, char *argv[])
 {
+	int c;
+	int debug_level = 1;
 	TALLOC_CTX *mem_ctx = NULL;
 	struct swnd_context *swnd_ctx = NULL;
 	int ret;
+
+	while ((c = getopt_long(argc, argv, "d:", long_options, NULL)) != -1) {
+		switch (c) {
+		case 'd':
+			debug_level = strtoul(optarg, NULL, 10);
+			break;
+		default:
+			sd_journal_print(LOG_ERR, "unknown option: %c", c);
+			return EXIT_FAILURE;
+		}
+	}
 
 	mem_ctx = talloc_new(NULL);
 	if (mem_ctx == NULL) {
@@ -1020,8 +1039,7 @@ int main(int argc, char *argv[])
 	}
 
 	/* Setup samba logging */
-	/* TODO Add a parameter to set the debug level */
-	ret = swnc_set_debug_callback(swnd_ctx, 10, samba_debug_cb);
+	ret = swnc_set_debug_callback(swnd_ctx, debug_level, samba_debug_cb);
 	if (ret != 0) {
 		sd_journal_print(LOG_ERR,
 				 "Failed to set samba debug callback: %s\n",
